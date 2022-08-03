@@ -1,6 +1,6 @@
 def translate_message(err_message: list[str]) -> str:
     """Возвращает русский текст ошибки."""
-    err_message = err_message[1:]
+    err_message = err_message[1:] if err_message[0] == 'Traceback (most recent call last):' else err_message
     result = f'{_get_location(err_message[0]).capitalize()}:\n  {err_message[1]}\n{_get_message(err_message[2])}'
     return result
 
@@ -23,3 +23,4 @@ def _get_error_type(err_type: str) -> str:
     match err_type:
         case 'NameError':
             return 'ошибка имени'
+    return 'неизвестная ошибка'
