@@ -27,6 +27,16 @@ def _get_error_type(err_type: str) -> str:
     match err_type:
         case 'NameError':
             return 'ошибка имени'
+        case 'ValueError':
+            return 'ошибка значения'
+        case 'TypeError':
+            return 'ошибка типа'
+        case 'SyntaxError':
+            return 'ошибка синтаксиса'
+        case 'ZeroDivisionError':
+            return 'ошибка деления на ноль'
+        case 'FileNotFoundError':
+            return 'файл или каталог не найден'
     return 'неизвестная ошибка'
 
 
@@ -37,4 +47,23 @@ def _get_message(err_type: str, message: str) -> str:
             if re.match(r"name '\w+' is not defined.", message) is not None:
                 name = message[6: message.rfind("'")]
                 return f"имя '{name}' не определено"
+        case 'TypeError':
+            if re.match(r"unsupported operand type\(s\) for [+\-*/|&^]: '\w+' and '\w+'", message) is not None:
+                operator = message[32: 33]
+                operand1 = message[message.find("'") + 1: message.find("'", message.find("'") + 1)]
+                operand2 = message[47: message.rfind("'")]
+                return f"неподдерживаемый оператор {operator} для типов '{operand1}' и '{operand2}'"
+        case 'SyntaxError':
+            if message == 'invalid syntax':
+                return 'неправильно написана строка'
+            elif message == "'return' outside function":
+                return "ключевое слово 'return' вне функции"
+            elif message == "'break' outside loop":
+                return "ключевое слово 'break' вне цикла"
+            elif message == "'continue' not properly in loop":
+                return "ключевое слово 'continue' вне цикла"
+        case 'ZeroDivisionError':
+            return 'на ноль делить нельзя'
+        case 'FileNotFoundError':
+            return f'{message[38:-1]}'
     return 'неизвестная ошибка'
