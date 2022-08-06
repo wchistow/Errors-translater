@@ -1,18 +1,33 @@
 import re
 
+line = ''
+
 
 def translate_message(err_message: list[str]) -> str:
     """Возвращает русский текст ошибки."""
+    global line
+
     err_message = err_message[1:] if err_message[0] == 'Traceback (most recent call last):' else err_message
-    result = f'{_get_location(err_message[0]).capitalize()}:\n  {err_message[1]}\n{_get_error(err_message[2])}'
+
+    location = _get_location(err_message[0])
+    line = err_message[1] if re.match(r'File "<stdin>", line \d+, in <module>', location) is not None else ''
+    message = _get_error(err_message[1] if line == '' else err_message[2])
+
+    if line == '':
+        result = f'{location.capitalize()}:\n  {message}'
+    else:
+        result = f'{location.capitalize()}:\n  {line}\n{message}'
     return result
 
 
 def _get_location(location: str) -> str:
     """Возвращает русский текст места ошибки."""
-    file = location[6:location.rfind('"')]
-    line = location[location.find(',') + 7: location.rfind(',')]
-    return f'в файле "{file}", строке {line}'
+    if line == '':
+        return 'в интерпретаторе'
+    else:
+        file = location[6:location.rfind('"')]
+        line_num = location[location.find(',') + 7: location.rfind(',')]
+        return f'в файле "{file}", строке {line_num}'
 
 
 def _get_error(message: str) -> str:
@@ -44,7 +59,7 @@ def _get_message(err_type: str, message: str) -> str:
     """Возвращает русский текст сообщения ошибки."""
     match err_type:
         case 'NameError':
-            if re.match(r"name '\w+' is not defined.", message) is not None:
+            if re.match(r"name '\w+' is not defined", message) is not None:
                 name = message[6: message.rfind("'")]
                 return f"имя '{name}' не определено"
         case 'TypeError':
@@ -57,11 +72,11 @@ def _get_message(err_type: str, message: str) -> str:
             if message == 'invalid syntax':
                 return 'неправильно написана строка'
             elif message == "'return' outside function":
-                return "ключевое слово 'return' вне функции"
+                return "ключевое слово 'return' не в функции"
             elif message == "'break' outside loop":
-                return "ключевое слово 'break' вне цикла"
+                return "ключевое слово 'break' не в цикле"
             elif message == "'continue' not properly in loop":
-                return "ключевое слово 'continue' вне цикла"
+                return "ключевое слово 'continue' не в цикле"
         case 'ZeroDivisionError':
             return 'на ноль делить нельзя'
         case 'FileNotFoundError':
