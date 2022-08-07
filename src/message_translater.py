@@ -9,8 +9,9 @@ def translate_message(err_message: list[str]) -> str:
 
     err_message = err_message[1:] if err_message[0] == 'Traceback (most recent call last):' else err_message
 
+    line = '' if re.match(r'File "<stdin>", line \d+, in <module>', err_message[0]) is not None else err_message[1]
+
     location = _get_location(err_message[0])
-    line = err_message[1] if re.match(r'File "<stdin>", line \d+, in <module>', location) is not None else ''
     message = _get_error(err_message[1] if line == '' else err_message[2])
 
     if line == '':
