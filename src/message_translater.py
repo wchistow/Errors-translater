@@ -9,21 +9,37 @@ def translate_message(err_message: list[str]) -> str:
 
     err_message = err_message[1:] if err_message[0] == 'Traceback (most recent call last):' else err_message
 
-    line = '' if re.match(r'File "<stdin>", line \d+, in <module>', err_message[0]) is not None else err_message[1]
+    if len(err_message) in (2, 3):
+        line = '' if re.match(r'File "<stdin>", line \d+, in <module>', err_message[0]) is not None else err_message[1]
 
-    location = _get_location(err_message[0])
-    message = _get_error(err_message[1] if line == '' else err_message[2])
+        location = _get_location(err_message[0])
+        message = _get_error(err_message[1] if line == '' else err_message[2])
 
-    if line == '':
-        result = f'{location.capitalize()}:\n  {message}'
+        if line == '':
+            result = f'{location.capitalize()}:\n  {message}'
+        else:
+            result = f'{location.capitalize()}:\n  {line}\n{message}'
+        return result
     else:
-        result = f'{location.capitalize()}:\n  {line}\n{message}'
-    return result
+        result = ''
+
+        for err_line in err_message:
+            if re.match(r'File ".+", line \d+, in .+', err_line) is not None:
+                result += f'{_get_location(err_line)}:\n  '
+            elif re.match(r'[A-Z]\w+: .+', err_line) is not None:
+                result += _get_error(err_line)
+                break
+            else:  # Строка кода
+                result += f'{err_line}\n'
+
+        if result.endswith('\n'):
+            result = result[:-1]
+        return result
 
 
 def _get_location(location: str) -> str:
     """Возвращает русский текст места ошибки."""
-    if line == '':
+    if re.match(r'File "<stdin>", line \d+, in <module>', location):
         return 'в интерпретаторе'
     else:
         file = location[6:location.rfind('"')]
