@@ -22,8 +22,3 @@ while count != 0:
     count -= 1
 
 print(translate_message(err_message))
-
-'''Traceback (most recent call last):
-  File "E:\vladimir\Python\errors_translater\src\main.py", line 8, in <module>
-    while coun != 0:
-NameError: name 'coun' is not defined. Did you mean: 'count'?'''
