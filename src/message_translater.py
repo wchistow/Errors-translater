@@ -25,7 +25,7 @@ def translate_message(err_message: list[str]) -> str:
 
         for err_line in err_message:
             if re.match(r'File ".+", line \d+, in .+', err_line) is not None:
-                result += f'{_get_location(err_line)}:\n  '
+                result += f'{_get_location(err_line).capitalize()}:\n  '
             elif re.match(r'[A-Z]\w+: .+', err_line) is not None:
                 result += _get_error(err_line)
                 break
