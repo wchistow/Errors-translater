@@ -76,11 +76,11 @@ def _get_message(err_type: str, message: str) -> str:
     """Возвращает русский текст сообщения ошибки."""
     match err_type:
         case 'NameError':
-            if re.match(r"^name '\w+' is not defined$", message) is not None:
+            if re.match(r"name '\w+' is not defined", message) is not None:
                 name = message[6: message.rfind("'")]
                 return f"имя '{name}' не определено"
         case 'TypeError':
-            if re.match(r"^unsupported operand type\(s\) for [+\-*/|&^]: '\w+' and '\w+'$", message) is not None:
+            if re.match(r"unsupported operand type\(s\) for [+\-*/|&^]: '\w+' and '\w+'", message) is not None:
                 operator = message[32: 33]
                 operand1 = message[message.find("'") + 1: message.find("'", message.find("'") + 1)]
                 operand2 = message[47: message.rfind("'")]
