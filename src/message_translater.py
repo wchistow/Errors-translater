@@ -73,7 +73,10 @@ def _get_error(message: str) -> str:
     """Возвращает русский текст названия и сообщения ошибки."""
     err_type = message[:message.find(':')]
     err_message = message[message.find(':') + 2:]
-    return f'{_get_error_type(err_type).capitalize()}: {_get_message(err_type, err_message)}.'
+
+    ru_type = _get_error_type(err_type).capitalize()
+    ru_message = _get_message(err_type, err_message)
+    return f'{ru_type}{": " if ru_message else ""}{ru_message}{"." if ru_message else ""}'
 
 
 def _get_error_type(err_type: str) -> str:
@@ -96,6 +99,9 @@ def _get_error_type(err_type: str) -> str:
 
 def _get_message(err_type: str, message: str) -> str:
     """Возвращает русский текст сообщения ошибки."""
+    if message == 'None':
+        return ''
+
     match err_type:
         case 'NameError':
             if re.match(r"^name '\w+' is not defined[.| ]$", message) is not None:
