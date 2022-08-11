@@ -3,6 +3,20 @@ import re
 line = ''
 
 
+def _translate_simple_error(err_message: list[str]) -> str:
+    global line
+    line = '' if re.match(r'^File "<stdin>", line \d+, in <module>$', err_message[0]) is not None else err_message[1]
+
+    location = _get_location(err_message[0])
+    message = _get_error(err_message[1] if line == '' else err_message[2])
+
+    if line == '':
+        result = f'{location.capitalize()}:\n  {message}'
+    else:
+        result = f'{location.capitalize()}:\n  {line}\n{message}'
+    return result
+
+
 def translate_message(err_message: list[str]) -> str:
     """Возвращает русский текст ошибки."""
     global line
@@ -10,31 +24,39 @@ def translate_message(err_message: list[str]) -> str:
     err_message = err_message[1:] if err_message[0] == 'Traceback (most recent call last):' else err_message
 
     if len(err_message) in (2, 3):
-        line = '' if re.match(r'^File "<stdin>", line \d+, in <module>$', err_message[0]) is not None else err_message[1]
-
-        location = _get_location(err_message[0])
-        message = _get_error(err_message[1] if line == '' else err_message[2])
-
-        if line == '':
-            result = f'{location.capitalize()}:\n  {message}'
-        else:
-            result = f'{location.capitalize()}:\n  {line}\n{message}'
-        return result
+        _translate_simple_error(err_message)
     else:
-        result = ''
+        if 'During handling of the above exception, another exception occurred:' in err_message:
+            first_err = []
+            for err_line in err_message:
+                if err_line == 'During handling of the above exception, another exception occurred:':
+                    first_err.pop()
+                    break
+                first_err.append(err_line)
 
-        for err_line in err_message:
-            if re.match(r'^File ".+", line \d+, in .+$', err_line) is not None:
-                result += f'{_get_location(err_line).capitalize()}:\n  '
-            elif re.match(r'^[A-Z]\w+: .+$', err_line) is not None:
-                result += _get_error(err_line)
-                break
-            else:  # Строка кода
-                result += f'{err_line}\n'
+            second_err = err_message[len(first_err) + 4:]
+            second_err = second_err[1:] if second_err[0] == 'Traceback (most recent call last):' else second_err
 
-        if result.endswith('\n'):
-            result = result[:-1]
-        return result
+            result =\
+                f'''{_translate_simple_error(first_err)
+                }\n\nВо время обработки вышеупомянутого исключения произошло следующее исключение:\n\n{
+                _translate_simple_error(second_err)}'''
+            return result
+        else:
+            result = ''
+
+            for err_line in err_message:
+                if re.match(r'^File ".+", line \d+, in .+$', err_line) is not None:
+                    result += f'{_get_location(err_line).capitalize()}:\n  '
+                elif re.match(r'^[A-Z]\w+: .+$', err_line) is not None:
+                    result += _get_error(err_line)
+                    break
+                else:  # Строка кода
+                    result += f'{err_line}\n'
+
+            if result.endswith('\n'):
+                result = result[:-1]
+            return result
 
 
 def _get_location(location: str) -> str:

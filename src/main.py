@@ -15,6 +15,16 @@ while count != 0:
             err_message.append(line)
         break
 
+    if count == 1 and line == 'During handling of the above exception, another exception occurred:':
+        # Это ошибка с двумя частями
+        err_message.append(line)
+        while re.match(r'^[A-Z]\w+: .+$', line) is None:
+            line = input().strip()
+            err_message.append(line)
+        input()
+        input()
+        break
+
     if re.match(r'^File "<stdin>", line \d+, in <module>$', line) is not None:
         count -= 3
     err_message.append(line)
