@@ -24,23 +24,31 @@ def translate_message(err_message: list[str]) -> str:
     err_message = err_message[1:] if err_message[0] == 'Traceback (most recent call last):' else err_message
 
     if len(err_message) in (2, 3):
-        _translate_simple_error(err_message)
+        return _translate_simple_error(err_message)
     else:
         if 'During handling of the above exception, another exception occurred:' in err_message:
-            first_err = []
-            for err_line in err_message:
-                if err_line == 'During handling of the above exception, another exception occurred:':
-                    first_err.pop()
+            result = ''
+            error = []
+            index = 0
+            for _ in range(len(err_message)):
+                try:
+                    err_line = err_message[index]
+                except IndexError:
+                    result += f'{_translate_simple_error(error)}' + \
+                               '\n\nВо время обработки вышеупомянутого исключения произошло следующее исключение:\n\n'
                     break
-                first_err.append(err_line)
 
-            second_err = err_message[len(first_err) + 4:]
-            second_err = second_err[1:] if second_err[0] == 'Traceback (most recent call last):' else second_err
+                if err_line == 'During handling of the above exception, another exception occurred:':
+                    error.pop()
+                    result += f'{_translate_simple_error(error)}' + \
+                              '\n\nВо время обработки вышеупомянутого исключения произошло следующее исключение:\n\n'
+                    index += 3
+                    error = []
+                else:
+                    error.append(err_line)
+                    index += 1
 
-            result =\
-                f'''{_translate_simple_error(first_err)
-                }\n\nВо время обработки вышеупомянутого исключения произошло следующее исключение:\n\n{
-                _translate_simple_error(second_err)}'''
+            result = '\n'.join(result.splitlines()[:-4])
             return result
         else:
             result = ''
