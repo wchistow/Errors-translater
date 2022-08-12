@@ -48,7 +48,7 @@ def translate_message(err_message: list[str]) -> str:
                     error.append(err_line)
                     index += 1
 
-            result = '\n'.join(result.splitlines()[:-4])
+            result = '\n'.join(result.splitlines()[:-3])
             return result
         else:
             result = ''
@@ -154,4 +154,4 @@ def _get_message(err_type: str, message: str) -> str:
             return 'на ноль делить нельзя'
         case 'FileNotFoundError':
             return f'{message[38:-1]}'
-    return 'неизвестная ошибка'
+    return message
