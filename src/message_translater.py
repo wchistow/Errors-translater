@@ -1,3 +1,4 @@
+import json
 import re
 
 line = ''
@@ -89,20 +90,12 @@ def _get_error(message: str) -> str:
 
 def _get_error_type(err_type: str) -> str:
     """Возвращает русский перевод типа ошибки."""
-    match err_type:
-        case 'NameError':
-            return 'ошибка имени'
-        case 'ValueError':
-            return 'ошибка значения'
-        case 'TypeError':
-            return 'ошибка типа'
-        case 'SyntaxError':
-            return 'ошибка синтаксиса'
-        case 'ZeroDivisionError':
-            return 'ошибка деления на ноль'
-        case 'FileNotFoundError':
-            return 'файл или каталог не найден'
-    return 'неизвестная ошибка'
+    errors_types = json.load(open('db/errors_types.json', encoding='utf-8'))
+
+    try:
+        return errors_types[err_type]
+    except KeyError:
+        return 'неизвестная ошибка'
 
 
 def _get_message(err_type: str, message: str) -> str:

@@ -1,0 +1,8 @@
+{
+  "NameError": "ошибка имени",
+  "ValueError": "ошибка значения",
+  "TypeError": "ошибка типа",
+  "SyntaxError": "ошибка синтаксиса",
+  "ZeroDivisionError": "ошибка деления на ноль",
+  "FileNotFoundError": "файл или каталог не найден"
+}
