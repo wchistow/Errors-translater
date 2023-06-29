@@ -1,9 +1,15 @@
 {
+    "NameError": {
+        "name '$name$' is not defined": "имя '$name$' не определено",
+        "name '$name$' is not defined\\. Did you mean: '$cond$'\\?": "имя '$name$' не определено. Может быть вы имели в виду '$cond$'?"
+    },
     "SyntaxError": {
         "invalid syntax": "неправильно написана строка",
         "'return' outside function": "ключевое слово 'return' не в функции",
         "'break' outside loop": "ключевое слово 'break' не в цикле",
         "'continue' not properly in loop": "ключевое слово 'continue' не в цикле"
     },
-    "ZeroDivisionError": "на ноль делить нельзя"
+    "ZeroDivisionError": {
+        "division by zero": "на ноль делить нельзя"
+    }
 }

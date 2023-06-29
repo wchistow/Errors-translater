@@ -1,7 +1,13 @@
 import json
 import re
+from enum import Enum
 
 line = ''
+
+
+class ParserState(Enum):
+    WAITING = 0
+    IN_VARIABLE = 1
 
 
 def _translate_simple_error(err_message: list[str]) -> str:
@@ -100,52 +106,47 @@ def _get_error_type(err_type: str) -> str:
 
 def _get_message(err_type: str, message: str) -> str:
     """Возвращает русский текст сообщения ошибки."""
-    errors_messages = json.load(open('db/errors_messages.json', encoding='utf-8'))
-
     if message == 'None':
         return ''
 
+    errors_messages = json.load(open('db/errors_messages.json', encoding='utf-8'))\
+
     try:
         messages = errors_messages[err_type]
-        if isinstance(messages, dict):
-            try:
-                return messages[message]
-            except KeyError:
-                return 'неизвестная ошибка'
+        for k, v in messages.items():
+            if re.fullmatch(re.sub(r'\$\w+\$', '\\\w+', k), message) is not None:
+                orig_message = k
+                ru_message = v
+                break
         else:
-            return messages
+            return '<нет перевода>'
     except KeyError:
-        match err_type:
-            case 'NameError':
-                if re.match(r"^name '\w+' is not defined[.| ]$", message) is not None:
-                    name = message[6: message.rfind("'")]
-                    return f"имя '{name}' не определено"
-                elif re.match(r"^name '\w+' is not defined. Did you mean: '\w+'\?$", message) is not None:
-                    name = ''
-                    in_name = False
-                    for s in message:
-                        if s == "'" and name == '':
-                            in_name = True
-                        elif s == "'" and name != '':
-                            in_name = False
-                        elif in_name:
-                            name += s
-                    mean_name = ''
-                    in_mean_name = False
-                    for s in message[message.find('.'):]:
-                        if s == "'" and mean_name == '':
-                            in_mean_name = True
-                        elif s == "'" and mean_name != '':
-                            in_mean_name = False
-                        elif in_mean_name:
-                            mean_name += s
-                    return f"имя '{name}' не определено. Может быть вы имели ввиду '{mean_name}'?"
-            case 'TypeError':
-                if re.match(r"unsupported operand type\(s\) for [+\-*/|&^]: '\w+' and '\w+'", message) is not None:
-                    operator = message[32: 33]
-                    operand1 = message[message.find("'") + 1: message.find("'", message.find("'") + 1)]
-                    operand2 = message[47: message.rfind("'")]
-                    return f"неподдерживаемый оператор {operator} для типов '{operand1}' и '{operand2}'"
-            case 'FileNotFoundError':
-                return f'{message[38:-1]}'
-        return 'неизвестная ошибка'
+        return '<нет перевода>'
+    else:
+        if '$' in orig_message:
+            state = ParserState.WAITING
+            cur_name = ''
+            variables = []
+
+            for c in orig_message:
+                if state == ParserState.WAITING and c == '$':  # вошли в переменную
+                    state = ParserState.IN_VARIABLE
+                elif state == ParserState.IN_VARIABLE and c == '$':  # вышли из переменной
+                    state = ParserState.WAITING
+                    variables.append(cur_name)
+                    cur_name = ''
+                elif state == ParserState.IN_VARIABLE:  # в переменной
+                    cur_name += c
+
+            regex = orig_message
+            for variable in variables:
+                regex = regex.replace(f'${variable}$', rf'(?P<{variable}>\w+)')
+
+            m = re.match(regex, message)
+            # Словарь вида "имя_переменной": "значение_переменной"
+            for name, val in zip(variables, m.groups()):
+                ru_message = ru_message.replace(f'${name}$', val)
+
+            return ru_message
+        else:
+            return ru_message
