@@ -96,7 +96,8 @@ def _get_error(message: str) -> str:
 
 def _get_error_type(err_type: str) -> str:
     """Возвращает русский перевод типа ошибки."""
-    errors_types = json.load(open('db/errors_types.json', encoding='utf-8'))
+    with open('db/errors_types.json', encoding='utf-8') as f:
+        errors_types = json.load(f)
 
     try:
         return errors_types[err_type]
@@ -109,7 +110,8 @@ def _get_message(err_type: str, message: str) -> str:
     if message == 'None':
         return ''
 
-    errors_messages = json.load(open('db/errors_messages.json', encoding='utf-8'))\
+    with open('db/errors_messages.json', encoding='utf-8') as f:
+        errors_messages = json.load(f)
 
     try:
         messages = errors_messages[err_type]
