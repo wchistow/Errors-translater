@@ -116,7 +116,7 @@ def _get_message(err_type: str, message: str) -> str:
     try:
         messages = errors_messages[err_type]
         for k, v in messages.items():
-            if re.fullmatch(re.sub(r'\$\w+\$', '\\\w+', k), message) is not None:
+            if re.fullmatch(re.sub(r'\$\w+\$', '.+', k), message) is not None:
                 orig_message = k
                 ru_message = v
                 break
@@ -142,7 +142,7 @@ def _get_message(err_type: str, message: str) -> str:
 
             regex = orig_message
             for variable in variables:
-                regex = regex.replace(f'${variable}$', r'(\w+)')
+                regex = regex.replace(f'${variable}$', r'(.+)')
 
             m = re.match(regex, message)
             # Словарь вида "имя_переменной": "значение_переменной"
