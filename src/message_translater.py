@@ -140,7 +140,7 @@ def _get_message(err_type: str, message: str) -> str:
 
             regex = orig_message
             for variable in variables:
-                regex = regex.replace(f'${variable}$', rf'(?P<{variable}>\w+)')
+                regex = regex.replace(f'${variable}$', r'(\w+)')
 
             m = re.match(regex, message)
             # Словарь вида "имя_переменной": "значение_переменной"
