@@ -86,12 +86,15 @@ def _get_location(location: str) -> str:
 
 def _get_error(message: str) -> str:
     """Возвращает русский текст названия и сообщения ошибки."""
-    err_type = message[:message.find(':')]
-    err_message = message[message.find(':') + 2:]
+    if ':' in message:
+        err_type = message[:message.find(':')]
+        err_message = message[message.find(':') + 2:]
 
-    ru_type = _get_error_type(err_type).capitalize()
-    ru_message = _get_message(err_type, err_message)
-    return f'{ru_type}{": " if ru_message else ""}{ru_message}{"." if ru_message else ""}'
+        ru_type = _get_error_type(err_type).capitalize()
+        ru_message = _get_message(err_type, err_message)
+        return f'{ru_type}{": " if ru_message else ""}{ru_message}{"." if ru_message else ""}'
+    else:  # без сообщения, например `KeyboardInterrupt`
+        return _get_error_type(message).capitalize()
 
 
 def _get_error_type(err_type: str) -> str:
