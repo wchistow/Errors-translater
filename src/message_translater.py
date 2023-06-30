@@ -61,7 +61,8 @@ def translate_message(err_message: list[str]) -> str:
             result = ''
 
             for err_line in err_message:
-                if re.match(r'^File ".+", line \d+, in .+$', err_line) is not None:
+                if re.match(r'^File ".+", line \d+, in .+$', err_line) is not None or\
+                       re.match(r'^File ".+", line \d+$', err_line) is not None:
                     result += f'{_get_location(err_line).capitalize()}:\n  '
                 elif re.match(r'^\[Previous line repeated \d+ more times]$', err_line) is not None:
                     m = re.match(r'^\[Previous line repeated (\d+) more times]$', err_line)
@@ -79,7 +80,8 @@ def translate_message(err_message: list[str]) -> str:
 
 def _get_location(location: str) -> str:
     """Возвращает русский текст места ошибки."""
-    if re.match(r'^File "<stdin>", line \d+, in <module>$', location):
+    if re.match(r'^File "<stdin>", line \d+, in <module>$', location) is not None or\
+           re.match(r'^File "<stdin>", line \d+$', location) is not None:
         return 'в интерпретаторе'
     else:
         file = location[6:location.rfind('"')]
