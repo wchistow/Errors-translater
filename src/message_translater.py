@@ -63,6 +63,9 @@ def translate_message(err_message: list[str]) -> str:
             for err_line in err_message:
                 if re.match(r'^File ".+", line \d+, in .+$', err_line) is not None:
                     result += f'{_get_location(err_line).capitalize()}:\n  '
+                elif re.match(r'^\[Previous line repeated \d+ more times]$', err_line) is not None:
+                    m = re.match(r'^\[Previous line repeated (\d+) more times]$', err_line)
+                    result += f'[Предыдущая строка повторена ещё {m.groups()[0]} раз]\n'
                 elif re.match(r'^[A-Z]\w+: .+$', err_line) is not None:
                     result += _get_error(err_line)
                     break
