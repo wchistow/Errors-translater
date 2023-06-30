@@ -1,4 +1,12 @@
 {
+    "AttributeError": {
+        "'$type$' object has no attribute '$attr$'": "объект типа '$type$' не имеет атрибута '$attr$'"
+    },
+    "IndentationError": {
+        "expected an indented block after function definition on line $line$": "нет блока с отступом после определения функции в строке $line$",
+        "expected an indented block after '$stat$' statement on line $line$": "нет блока с отступом после конструкции '$stat$' в строке $line$",
+        "expected an indented block after class definition on line $line$": "нет блока с отступом после определения класса в строке $line$"
+    },
     "KeyError": {
         "$key$": "$key$"
     },
@@ -6,11 +14,24 @@
         "name '$name$' is not defined": "имя '$name$' не определено",
         "name '$name$' is not defined\\. Did you mean: '$cond$'\\?": "имя '$name$' не определено. Может быть вы имели в виду '$cond$'?"
     },
+    "RecursionError": {
+        "maximum recursion depth exceeded": "превышена максимальная глубина рекурсии"
+    },
     "SyntaxError": {
         "invalid syntax": "неправильно написана строка",
         "'return' outside function": "ключевое слово 'return' не в функции",
         "'break' outside loop": "ключевое слово 'break' не в цикле",
         "'continue' not properly in loop": "ключевое слово 'continue' не в цикле"
+    },
+    "TypeError": {
+        "unsupported operand type\\(s\\) for $op$: '$type1$' and '$type2$'": "недопустимые типы операндов для оператора '$op$': '$type1$' и '$type2$'",
+        "bad operand type for unary $op$: '$type$'": "недопустимый тип операнда для унарного оператора $op$: '$type$'"
+    },
+    "UnboundLocalError": {
+        "local variable '$name$' referenced before assignment": "локальная переменная '$name$' используется до определения"
+    },
+    "ValueError": {
+        "invalid literal for int\\(\\) with base $base$: '$val$'": "недопустимое значение для int() с основанием $base$: '$val$'"
     },
     "ZeroDivisionError": {
         "division by zero": "на ноль делить нельзя"
