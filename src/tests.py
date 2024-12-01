@@ -38,6 +38,14 @@ class MessageTranslaterTestCase(unittest.TestCase):
                     "Ошибка имени: имя 'coun' не определено."]
 
         self.assertEqual(translate_message(error), '\n'.join(good_ans))
+    
+    def test_one_line_error(self):
+        error = ["NameError: name 'coun' is not defined"]
+        good_ans = "Ошибка имени: имя 'coun' не определено."
+
+        tr_err = translate_message(error)
+        print(tr_err)
+        self.assertEqual(tr_err, good_ans)
 
 
 unittest.main()
