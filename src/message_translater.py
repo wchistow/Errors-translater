@@ -1,8 +1,10 @@
 import json
 import re
 from enum import Enum
+from pathlib import Path
 
 line = ''
+db_path = Path(__file__).parent / 'db'
 
 
 class ParserState(Enum):
@@ -104,7 +106,7 @@ def _get_error(message: str) -> str:
 
 def _get_error_type(err_type: str) -> str:
     """Возвращает русский перевод типа ошибки."""
-    with open('db/errors_types.json', encoding='utf-8') as f:
+    with open(db_path / 'errors_types.json', encoding='utf-8') as f:
         errors_types = json.load(f)
 
     try:
@@ -118,7 +120,7 @@ def _get_message(err_type: str, message: str) -> str:
     if message == 'None':
         return ''
 
-    with open('db/errors_messages.json', encoding='utf-8') as f:
+    with open(db_path / 'errors_messages.json', encoding='utf-8') as f:
         errors_messages = json.load(f)
 
     try:
